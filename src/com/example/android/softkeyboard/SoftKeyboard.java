@@ -132,7 +132,7 @@ public class SoftKeyboard extends InputMethodService
 	private final double alpha = .0001;
 	private final double beta = .01;
 	private int count = 0;
-	private ArrayList<String> candidates;
+	private ArrayList<String> candidates = new ArrayList<String>();
 	private Boolean isPotentialNewWord = false;
 	private Boolean creatingNewWord = false;
 	private Boolean isUpperCase = false;
@@ -367,7 +367,6 @@ public class SoftKeyboard extends InputMethodService
 			                        		else if (candidates != null && currentSequence.length() > 0) {
 			                        			pickDefaultCandidate();
 			                        			candidates = null;
-			                        			updateCandidates(null);
 			                        			currentSequence = "";
 			                        			if (mCandidateView != null) {
 			                                        mCandidateView.clear();
@@ -375,10 +374,12 @@ public class SoftKeyboard extends InputMethodService
 			                        		}
 			                        		else {
 			                        			getCurrentInputConnection().commitText(" ", 1);
+			                        		}
 
 		                        		prevButton = "center";
 		                        		currentSequence = "";
-		                        	}
+		                        		getSuggestions();
+		                        	
 		                        }
 		                        
 		                        if (prevButton.equals("text")) {
@@ -386,7 +387,7 @@ public class SoftKeyboard extends InputMethodService
 		                        }
     
 		                        if (prevButton.equals("text") && (currentSequence.length() == 1 || creatingNewWord == true)) {
-		                        	candidates = new ArrayList<String>();
+		                        	getSuggestions();
 		                        	Log.v("AJ" ,"creating a new word " + potentialNewWord + " or we are just typing a single character");
 		                        	int seqInt = Integer.parseInt(currentSequence.substring(currentSequence.length() - 1));
 		                        	switch (seqInt){
@@ -603,7 +604,17 @@ public class SoftKeyboard extends InputMethodService
 			combo.addWordWNewCombo(combo, currentSequence, dataBuilder);
 		}
 		else {
-			temp.addWord(newWord);
+			Boolean isUnique = true;
+			List<Word> words = new LinkedList<Word>();
+			words = temp.getWordsSorted();
+        	for (int k = 0; k < words.size(); k++) {
+        		if(words.get(k).getWord().equals(newWord)) {
+        			isUnique = false;
+        		}
+        	}
+        	if (isUnique == true) {
+    			temp.addWord(newWord);
+        	}
 		}
 		
 	}
@@ -636,6 +647,9 @@ public class SoftKeyboard extends InputMethodService
                 	//Log.v("babysteps", candidates.toString() + " and words is " + words.toString());
             	}	
             } 
+            else {
+            	candidates = new ArrayList<String>();
+            }
     }
 
     /**

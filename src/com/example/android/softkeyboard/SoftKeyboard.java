@@ -135,8 +135,10 @@ public class SoftKeyboard extends InputMethodService
 	private ArrayList<String> candidates;
 	private Boolean isPotentialNewWord = false;
 	private Boolean creatingNewWord = false;
+	private Boolean isUpperCase = false;
 	public String potentialNewWord = ""; 
-	
+	private ImageView compass;
+	private DataBuilder dataBuilder = new DataBuilder();
 	private int LONG_PRESS_TIME = 900;
     /**
      * Main initialization of the input method component.  Be sure to call
@@ -180,10 +182,10 @@ public class SoftKeyboard extends InputMethodService
         } */
     	
     	
-        InputStream myInputStream = getResources().openRawResource(R.raw.keygonsequenceoutput);
+        InputStream myInputStream = getResources().openRawResource(R.raw.keygonsequenceoutput10k1);
         InputStream myInputStream2 = getResources().openRawResource(R.raw.book1);
 
-        DataBuilder dataBuilder = new DataBuilder();
+        
         dataBuilder.initializeData(myInputStream, myInputStream2);
         currentCombos = dataBuilder.getCombos();
     }
@@ -209,7 +211,7 @@ public class SoftKeyboard extends InputMethodService
      */
     @Override public View onCreateInputView() {
     	mInputView = getLayoutInflater().inflate(R.layout.compass, null);
-    	final ImageView compass;
+    	
     	final Bitmap nb = BitmapFactory.decodeResource(getResources(), R.drawable.nb);
         final Bitmap sb = BitmapFactory.decodeResource(getResources(), R.drawable.sb);
         final Bitmap eb = BitmapFactory.decodeResource(getResources(), R.drawable.eb);
@@ -365,28 +367,32 @@ public class SoftKeyboard extends InputMethodService
 		                        		prevXTouch = iX;
 		                        		prevYTouch = currY;
 		                        		Log.d("AJ", "CENTER was picked and creatingNewWord is " + creatingNewWord.toString() + " AND potentialNewWord is " + potentialNewWord.toString());
-		                        		
-		                        		if (creatingNewWord == true) {
-		                        			Log.v("AJ" ,"Potential new word being added " + potentialNewWord.toString());
-		                        			addNewWord(potentialNewWord);
-		                        			creatingNewWord = false;
-		                        			getCurrentInputConnection().commitText(" ", 1);
-		                        			potentialNewWord = "";
-		                        			isPotentialNewWord = false;
-		                        			creatingNewWord = false;
-		                        		}
-		                        		else if (candidates != null) {
-		                        			pickDefaultCandidate();
-		                        			candidates = null;
-		                        			updateCandidates(null);
-		                        			currentSequence = "";
-		                        			if (mCandidateView != null) {
-		                                        mCandidateView.clear();
-		                                    }
-		                        		}
-		                        		else {
-		                        			getCurrentInputConnection().commitText(" ", 1);
-		                        		}
+		                        		//if (prevButton.equals("moving")) {
+		                        			
+		                        		//}
+		                        		//else {	 
+			                        		if (creatingNewWord == true) {
+			                        			Log.v("AJ" ,"Potential new word being added " + potentialNewWord.toString());
+			                        			addNewWord(potentialNewWord);
+			                        			creatingNewWord = false;
+			                        			getCurrentInputConnection().commitText(" ", 1);
+			                        			potentialNewWord = "";
+			                        			isPotentialNewWord = false;
+			                        			creatingNewWord = false;
+			                        		}
+			                        		else if (candidates != null && currentSequence.length() > 0) {
+			                        			pickDefaultCandidate();
+			                        			candidates = null;
+			                        			updateCandidates(null);
+			                        			currentSequence = "";
+			                        			if (mCandidateView != null) {
+			                                        mCandidateView.clear();
+			                                    }
+			                        		}
+			                        		else {
+			                        			getCurrentInputConnection().commitText(" ", 1);
+			                        		}
+		                        	//	}
 		                        	
 		                        		prevButton = "center";
 		                        		currentSequence = "";
@@ -501,6 +507,7 @@ public class SoftKeyboard extends InputMethodService
 	                    	return true;
 	                    	
 	                    case MotionEvent.ACTION_MOVE:
+	                    	//prevButton = "moving";
 	                    	//_handler.removeCallbacks(_longPressed);
 	                    	if (isXYPositive && prevButton.equals("center")) {
 	                    		
@@ -537,14 +544,21 @@ public class SoftKeyboard extends InputMethodService
     }
     
     
+    
     class MyGestureDetector extends SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
+                if ((e1.getY() - e2.getY()) > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                	compass.setImageResource(R.drawable.compassupper);
+                	isUpperCase = true;
+                } 
+                else if (e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                	compass.setImageResource(R.drawable.compasslower);
+                	isUpperCase = false;
+                }
                 // right to left swipe DELETE FULL WORD
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                else if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     deleteLastWord();
                 }  
                 // left to right swipe DELETE FULL WORD 
@@ -558,6 +572,10 @@ public class SoftKeyboard extends InputMethodService
         }
     }
         
+    
+    private void changetoCapital() {
+    	
+    }
     /**
 	 * Deletes one word before the cursor.
 	 */
@@ -605,7 +623,17 @@ public class SoftKeyboard extends InputMethodService
 	public void addNewWord(String newWord) {
 		Log.v("AJ" ,"creating a new word " + currentSequence);
 		Combo temp = currentCombos.get(currentSequence);
-		temp.addWord(newWord);
+		if (temp == null) {
+			Word newWordObj = new Word(newWord, 9001);
+			List<Word> newWords = new LinkedList<Word>();
+			newWords.add(newWordObj);
+			Combo combo = new Combo(currentSequence, newWords);
+			combo.addWordWNewCombo(combo, currentSequence, dataBuilder);
+		}
+		else {
+			temp.addWord(newWord);
+		}
+		
 	}
 	
 	/**

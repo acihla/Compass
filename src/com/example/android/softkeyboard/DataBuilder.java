@@ -41,20 +41,23 @@ public class DataBuilder extends Activity {
         
         try {
 			HSSFWorkbook workbook = new HSSFWorkbook(myInputStream);
-			HSSFSheet worksheet = workbook.getSheet("keygonSequenceOutput");
+			HSSFSheet worksheet = workbook.getSheet("10kOutput");
 			
 			for(int i = 0; i < worksheet.getLastRowNum(); i++) {
 				HSSFRow currentRow = worksheet.getRow(i);
-				String currentCombo = currentRow.getCell(1).getStringCellValue().substring(1);
+				String currentCombo = currentRow.getCell(3).getStringCellValue();
 				String currentWord = currentRow.getCell(0).getStringCellValue();
+				Integer currentFreq = (int)currentRow.getCell(4).getNumericCellValue();
 				if (!_hashesToWords.containsKey(currentCombo)){
 					LinkedList<String> temp = new LinkedList<String>();
 					temp.add(currentWord);
 					_hashesToWords.put(currentCombo, temp);
+					_frequencies.put(currentWord, currentFreq);
 				} else {
 					List<String> temp = _hashesToWords.get(currentCombo);
 					temp.add(currentWord);
 					_hashesToWords.put(currentCombo, temp);
+					_frequencies.put(currentWord, currentFreq);
 				}
 			}
         } catch (FileNotFoundException e) {
@@ -62,7 +65,7 @@ public class DataBuilder extends Activity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+/*
         try {
 			HSSFWorkbook workbook = new HSSFWorkbook(myInputStream2);
 			HSSFSheet worksheet = workbook.getSheet("Sheet1");
@@ -79,13 +82,17 @@ public class DataBuilder extends Activity {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
 
 	}
 	
 	public void saveData()
 	{
 		//save the user data somehow
+	}
+	
+	public void addToCombos(String hash, Combo newCombo){
+		_currentCombos.put(hash, newCombo);
 	}
 	
 	public HashMap<String, Combo> getCombos()

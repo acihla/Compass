@@ -181,8 +181,11 @@ public class CandidateView extends View {
         for (int i = 0; i < count; i++) {
             String suggestion = mSuggestions.get(i);
             float textWidth = paint.measureText(suggestion);
-            final int wordWidth = (int) textWidth + X_GAP * 2;
-
+            int wordWidth = (int) textWidth + X_GAP * 2;
+            if (wordWidth < 130) {
+            	wordWidth = 130;
+            }
+          
             mWordX[i] = x;
             mWordWidth[i] = wordWidth;
             paint.setColor(mColorNormal);
@@ -190,6 +193,7 @@ public class CandidateView extends View {
                 if (canvas != null) {
                     canvas.translate(x, 0);
                     mSelectionHighlight.setBounds(0, bgPadding.top, wordWidth, height);
+                    
                     mSelectionHighlight.draw(canvas);
                     canvas.translate(-x, 0);
                 }
@@ -197,13 +201,15 @@ public class CandidateView extends View {
             }
 
             if (canvas != null) {
-                if ((i == 1 && !typedWordValid) || (i == 0 && typedWordValid)) {
+                /*if ((i == 1 && !typedWordValid) || (i == 0 && typedWordValid)) {
                     paint.setFakeBoldText(true);
                     paint.setColor(mColorRecommended);
                 } else if (i != 0) {
                     paint.setColor(mColorOther);
-                }
-                canvas.drawText(suggestion, x + X_GAP, y, paint);
+                }*/
+            	paint.setColor(mColorRecommended);
+            	
+                canvas.drawText(suggestion, x + (wordWidth - textWidth)/2, y, paint);
                 paint.setColor(mColorOther); 
                 canvas.drawLine(x + wordWidth + 0.5f, bgPadding.top, 
                         x + wordWidth + 0.5f, height + 1, paint);

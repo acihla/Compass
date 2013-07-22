@@ -35,6 +35,12 @@ public class Combo {
 		Word newWord  = new Word(word, _words.get(mid).getFrequency());
 		_words.add(newWord);
 	}
+	
+	public void addWordWNewCombo(Combo wordCombo, String hash, DataBuilder databuilder)
+	{
+		databuilder.addToCombos(hash,wordCombo);
+		//_words.add(newWord);
+	}
 
 	
 	private void generateNeighbors(String hash) {

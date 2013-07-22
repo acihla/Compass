@@ -254,22 +254,19 @@ public class SoftKeyboard extends InputMethodService
 	                    case MotionEvent.ACTION_DOWN:
 	                    	
 		                    if(!gliding) {
-		                        if (isXYPositive && iX<nb.getWidth() && currY<nb.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
 		                            if (nb.getPixel(iX,currY)!=0) {
 		                                // NORTH BUMPER
 		                            	prevButton = "northBump";
 		                            	Log.d("NB", "was picked");
 		                            	
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<sb.getWidth() && currY<sb.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                       
 		                            if (sb.getPixel(iX,currY)!=0) {
 		                                // SOUTH BUMPER
 		                            	prevButton = "southBump";
 		                            	Log.d("SB", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<eb.getWidth() && currY<eb.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                      
 		                            if (eb.getPixel(iX,currY)!=0) {
 		                                // EAST BUMPER
 		                            	prevButton = "eastBump";
@@ -279,8 +276,7 @@ public class SoftKeyboard extends InputMethodService
 	                    				//updateCandidates(candidates);
 		                            	Log.d("EB", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<wb.getWidth() && currY<wb.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                       
 		                            if (wb.getPixel(iX,currY)!=0) {
 		                                // WEST BUMPER
 		                            	prevButton = "westBump";
@@ -296,81 +292,69 @@ public class SoftKeyboard extends InputMethodService
 	                    				//updateCandidates(candidates);
 		                            	Log.d("WB", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<ng.getWidth() && currY<ng.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                      
 		                            if (ng.getPixel(iX,currY)!=0) {
 		                                // NORTH GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "0";
 		                            	Log.d("NG", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<neg.getWidth() && currY<neg.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                        
 		                            if (neg.getPixel(iX,currY)!=0) {
 		                                // NORTH EAST GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "1";
 		                            	Log.d("NEG", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<eg.getWidth() && currY<eg.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                        
 		                            if (eg.getPixel(iX,currY)!=0) {
 		                                // EAST GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "2";
 		                            	Log.d("EG", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<seg.getWidth() && currY<seg.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                       
 		                            if (seg.getPixel(iX,currY)!=0) {
 		                                // SOUTH EAST GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "3";
 		                            	Log.d("SEG", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<sg.getWidth() && currY<sg.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                        
 		                            if (sg.getPixel(iX,currY)!=0) {
 		                                // SOUTH GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "4";
 		                            	Log.d("SG", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<swg.getWidth() && currY<swg.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                       
 		                            if (swg.getPixel(iX,currY)!=0) {
 		                                // SOUTH WEST GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "5";
 		                            	Log.d("SWG", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<wg.getWidth() && currY<wg.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                        
 		                            if (wg.getPixel(iX,currY)!=0) {
 		                                // WEST GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "6";
 		                            	Log.d("WG", "was picked");
 		                            }               
-		                        }
-		                        if (isXYPositive && iX<nwg.getWidth() && currY<nwg.getHeight()) { // ** Makes sure that X and Y are not less than 0, and no more than the height and width of the image.                
+		                    
 		                            if (nwg.getPixel(iX,currY)!=0) {
 		                                // NORTH WEST GROUPING
 		                            	prevButton = "text";
 		                            	currentSequence += "7";
 		                            	Log.d("NWG", "was picked");
 		                            }            
-		                        }
-		                        if (isXYPositive && iX<center.getWidth() && currY<center.getHeight()) {
+
 		                        	if(center.getPixel(iX,currY) != 0) {
 		                        		// CENTER GROUPING
 		                        		prevXTouch = iX;
 		                        		prevYTouch = currY;
 		                        		Log.d("AJ", "CENTER was picked and creatingNewWord is " + creatingNewWord.toString() + " AND potentialNewWord is " + potentialNewWord.toString());
-		                        		//if (prevButton.equals("moving")) {
-		                        			
-		                        		//}
-		                        		//else {	 
+ 
 			                        		if (creatingNewWord == true) {
 			                        			Log.v("AJ" ,"Potential new word being added " + potentialNewWord.toString());
 			                        			addNewWord(potentialNewWord);
@@ -391,9 +375,7 @@ public class SoftKeyboard extends InputMethodService
 			                        		}
 			                        		else {
 			                        			getCurrentInputConnection().commitText(" ", 1);
-			                        		}
-		                        	//	}
-		                        	
+
 		                        		prevButton = "center";
 		                        		currentSequence = "";
 		                        	}
@@ -402,22 +384,7 @@ public class SoftKeyboard extends InputMethodService
 		                        if (prevButton.equals("text")) {
 		                        	_handler.postDelayed(_longPressed, LONG_PRESS_TIME);
 		                        }
-		                        /*
-		                        String[] temp;
-		                        if (prevWordDist.containsKey(lastWord)){
-		                        	//temp = ComboChecker.getWords(currentSequence, distribution, combos, combosToWords, prevWordDist.get(lastWord));
-		                        } else {
-		                        	//temp = ComboChecker.getWords(currentSequence, distribution, combos, combosToWords);
-		                        }
-		                       
-		                        if (count%10 == 0){
-		                        	//distribution = ComboChecker.updateDist(distribution); 
-		                        	Log.d("Dist", "Distribution updated");
-		                        }*/
-		                        
-		                        
-		                         
-		                        
+    
 		                        if (prevButton.equals("text") && (currentSequence.length() == 1 || creatingNewWord == true)) {
 		                        	candidates = new ArrayList<String>();
 		                        	Log.v("AJ" ,"creating a new word " + potentialNewWord + " or we are just typing a single character");

@@ -415,7 +415,7 @@ public class SoftKeyboard extends InputMethodService
 		                        	Log.d("Dist", "Distribution updated");
 		                        }*/
 		                        
-		                        getSuggestions();
+		                        
 		                         
 		                        
 		                        if (prevButton.equals("text") && (currentSequence.length() == 1 || creatingNewWord == true)) {
@@ -483,6 +483,7 @@ public class SoftKeyboard extends InputMethodService
 		                        	}
 		                        		
 		                        }
+		                        getSuggestions();
 		                    }
 	                        return true;     
 	                        
@@ -565,6 +566,10 @@ public class SoftKeyboard extends InputMethodService
                 else if (e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
                     deletePreviousWord();
                 }
+                if (prevButton.equals("text")) {
+            		currentSequence = currentSequence.substring(0,currentSequence.length() - 1);
+            		getSuggestions();
+            	}
             } catch (Exception e) {
                 // nothing
             }
@@ -649,7 +654,7 @@ public class SoftKeyboard extends InputMethodService
             
             if (temp != null) {
             	words = temp.getWordsSorted();
-            	
+            	Log.d("AJ", "In getSuggestions getting words " + words.toString());
             	if(words.get(0).getWord() != null)
             		candidates = new ArrayList<String>();
             	for (int k = 0; k < words.size() && k < 12; k++) {
@@ -806,6 +811,7 @@ public class SoftKeyboard extends InputMethodService
     	//Log.v("debugger", "in update Candidates");
     	if(currentSequence.length() > 0) {
 	    	ArrayList<String> bs = new ArrayList<String>();
+	    	
 	        setSuggestions(poss, false, false);
     	}
     	else {

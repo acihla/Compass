@@ -52,6 +52,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,6 +107,7 @@ public class SoftKeyboard extends InputMethodService
 	private int prevYTouch;
 	private int prevTouchTime; 
 	private String currentSequence = "";
+	private String currentGlidingSequence = "";
 	private Map<String, String[]> keygonSequences; 
 	private String textOutput;
 	private String lastWord;
@@ -139,7 +141,11 @@ public class SoftKeyboard extends InputMethodService
 	public String potentialNewWord = ""; 
 	private ImageView compass;
 	private DataBuilder dataBuilder = new DataBuilder();
-	private int LONG_PRESS_TIME = 900;
+	private int LONG_PRESS_TIME = 700;
+	private String buttonList[];
+	
+	private boolean inputNums = false;
+	private boolean inputChars = true;
     /**
      * Main initialization of the input method component.  Be sure to call
      * to super class.
@@ -457,10 +463,22 @@ public class SoftKeyboard extends InputMethodService
 	                        
 	                    case MotionEvent.ACTION_UP:
 	                    	_handler.removeCallbacks(_longPressed);
-	                    	if(gliding) {
-	                    		Log.d("AJ", "gliding action done handle possibilties!");
-	                    		currentSequence = "";
+	                    	if(gliding == true) {
+	                    		//Log.d("AJ", "gliding action done handle possibilties! changeCompassView is " + changeCompassView());
+	                    		
+	                    		if (changeCompassView() && inputChars) {
+	                    			compass.setImageResource(R.drawable.compassnumbers);
+	                    			inputNums = true;
+	                    			inputChars = false;
+	                    		}
+	                    		else if (changeCompassView() && inputNums) {
+	                    			compass.setImageResource(R.drawable.compasslower);
+	                    			inputNums = false;
+	                    			inputChars = true;
+	                    		}
+	                    			//some other ish
 	                    		////////////assessFlow(pointsQ);
+	                    		currentGlidingSequence = "";
 	                    		pointsQ.clear();
 	                    		gliding=false;
 	                    	}
@@ -500,8 +518,72 @@ public class SoftKeyboard extends InputMethodService
 	                    		//newMyPoint = new MyPoint(iX, currY);
 	                           // pointsQ.add(newMyPoint);
 	                            Log.d("AJ", "moving Swyping");
-	                            //something weird right now gliding = true;
-	                            prevButton = "gliding";
+	                            gliding = true;
+	                            
+	                            if(changeCompassView()) {
+		                            prevButton = "gliding";
+
+	                            }
+	                            
+	                            
+	                            if (ng.getPixel(iX,currY)!=0) {
+	                                // NORTH GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "0";
+	                            	Log.d("NG", "was picked");
+	                            }               
+	                        
+	                            if (neg.getPixel(iX,currY)!=0) {
+	                                // NORTH EAST GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "1";
+	                            	Log.d("NEG", "was picked");
+	                            }               
+	                        
+	                            if (eg.getPixel(iX,currY)!=0) {
+	                                // EAST GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "2";
+	                            	Log.d("EG", "was picked");
+	                            }               
+	                       
+	                            if (seg.getPixel(iX,currY)!=0) {
+	                                // SOUTH EAST GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "3";
+	                            	Log.d("SEG", "was picked");
+	                            }               
+	                        
+	                            if (sg.getPixel(iX,currY)!=0) {
+	                                // SOUTH GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "4";
+	                            	Log.d("SG", "was picked");
+	                            }               
+	                       
+	                            if (swg.getPixel(iX,currY)!=0) {
+	                                // SOUTH WEST GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "5";
+	                            	Log.d("SWG", "was picked");
+	                            }               
+	                        
+	                            if (wg.getPixel(iX,currY)!=0) {
+	                                // WEST GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "6";
+	                            	Log.d("WG", "was picked");
+	                            }               
+	                    
+	                            if (nwg.getPixel(iX,currY)!=0) {
+	                                // NORTH WEST GROUPING
+	                            	prevButton = "text";
+	                            	currentGlidingSequence += "7";
+	                            	Log.d("NWG", "was picked");
+	                            }  
+	                            
+	                            
+	                            
 	                            break;
 	                    	}
 	                        return true;   
@@ -545,6 +627,31 @@ public class SoftKeyboard extends InputMethodService
         }
     }
         
+    private boolean changeCompassView() {
+    	int currSeqLen = currentGlidingSequence.length();
+    	boolean clockwise = false;
+    	boolean counterclockwise = false; 
+    	int groupProgressionCount = 0;
+    	char firstChar;
+    	char secondChar;
+    	for (int i = 0; i < currSeqLen - 1; i++) {
+    		firstChar = currentGlidingSequence.charAt(i);
+    		secondChar = currentGlidingSequence.charAt(i+1);
+    		//Log.d("AJ", "first conditional is " + (!clockwise && ((firstChar > secondChar) || (firstChar == '1' && secondChar == '9'))));
+    		//Log.d("AJ", "second conditional is " + (!counterclockwise && ((firstChar < secondChar) || (firstChar == '9' && secondChar == '1'))));
+    		if (!clockwise && ((firstChar > secondChar) || (firstChar == '1' && secondChar == '9'))) {
+    			groupProgressionCount++;
+    			counterclockwise = true;
+    		}
+    		
+    		else if (!counterclockwise && ((firstChar < secondChar) || (firstChar == '9' && secondChar == '1'))) {
+    			groupProgressionCount++;
+    			clockwise = true;
+    		}
+    	}
+    	
+    	return ((clockwise || counterclockwise) && groupProgressionCount > 3);
+    }
     
     private void changetoCapital() {
     	
@@ -593,6 +700,7 @@ public class SoftKeyboard extends InputMethodService
 
 	}
 
+	
 	public void addNewWord(String newWord) {
 		Log.v("AJ" ,"creating a new word " + currentSequence);
 		Combo temp = currentCombos.get(currentSequence);

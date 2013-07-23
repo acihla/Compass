@@ -236,7 +236,7 @@ public class SoftKeyboard extends InputMethodService
     	final Handler _handler = new Handler(); 
     	final Runnable _longPressed = new Runnable() { 
     	    public void run() {
-    	    	Log.d("AJ", "LONG PRESSED RUNNING");
+    	    	//Log.d("AJ", "LONG PRESSED RUNNING");
     	        creatingNewWord = true;
     	    }   
     	};
@@ -476,6 +476,10 @@ public class SoftKeyboard extends InputMethodService
 	                    			inputNums = false;
 	                    			inputChars = true;
 	                    		}
+	                    		else {
+	                    			assessFlow();
+	                    		}
+	                
 	                    			//some other ish
 	                    		////////////assessFlow(pointsQ);
 	                    		currentGlidingSequence = "";
@@ -517,7 +521,7 @@ public class SoftKeyboard extends InputMethodService
 	                    	if (isXYPositive && prevButton.equals("text")){
 	                    		//newMyPoint = new MyPoint(iX, currY);
 	                           // pointsQ.add(newMyPoint);
-	                            Log.d("AJ", "moving Swyping");
+	                            //Log.d("AJ", "moving Swyping");
 	                            gliding = true;
 	                            
 	                            if(changeCompassView()) {
@@ -530,59 +534,61 @@ public class SoftKeyboard extends InputMethodService
 	                                // NORTH GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "0";
-	                            	Log.d("NG", "was picked");
+	                            	//Log.d("NG", "was picked");
 	                            }               
 	                        
 	                            if (neg.getPixel(iX,currY)!=0) {
 	                                // NORTH EAST GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "1";
-	                            	Log.d("NEG", "was picked");
+	                            	//Log.d("NEG", "was picked");
 	                            }               
 	                        
 	                            if (eg.getPixel(iX,currY)!=0) {
 	                                // EAST GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "2";
-	                            	Log.d("EG", "was picked");
+	                            	//Log.d("EG", "was picked");
 	                            }               
 	                       
 	                            if (seg.getPixel(iX,currY)!=0) {
 	                                // SOUTH EAST GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "3";
-	                            	Log.d("SEG", "was picked");
+	                            	//Log.d("SEG", "was picked");
 	                            }               
 	                        
 	                            if (sg.getPixel(iX,currY)!=0) {
 	                                // SOUTH GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "4";
-	                            	Log.d("SG", "was picked");
+	                            	//Log.d("SG", "was picked");
 	                            }               
 	                       
 	                            if (swg.getPixel(iX,currY)!=0) {
 	                                // SOUTH WEST GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "5";
-	                            	Log.d("SWG", "was picked");
+	                            	//Log.d("SWG", "was picked");
 	                            }               
 	                        
 	                            if (wg.getPixel(iX,currY)!=0) {
 	                                // WEST GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "6";
-	                            	Log.d("WG", "was picked");
+	                            	//Log.d("WG", "was picked");
 	                            }               
 	                    
 	                            if (nwg.getPixel(iX,currY)!=0) {
 	                                // NORTH WEST GROUPING
 	                            	prevButton = "text";
 	                            	currentGlidingSequence += "7";
-	                            	Log.d("NWG", "was picked");
+	                            	//Log.d("NWG", "was picked");
 	                            }  
 	                            
-	                            
+	                            if (center.getPixel(iX,currY) != 0) {
+	                            	//currentGlidingSequence += "///";
+	                            }
 	                            
 	                            break;
 	                    	}
@@ -626,6 +632,42 @@ public class SoftKeyboard extends InputMethodService
             return false;
         }
     }
+    
+    private void assessFlow() {
+    	int currSeqLen = currentGlidingSequence.length();
+    	int touchCount = 0;
+    	char prevGroup =  currentGlidingSequence.charAt(0);
+    	char currentGroup;
+    	Log.v("AJ", currentGlidingSequence);
+    	//String analyzedSequence = "";
+    	for (int i = 0; i < currSeqLen; i++) {
+    		currentGroup = currentGlidingSequence.charAt(i);
+    		if (currentGroup >= '0' && currentGroup <= '7') {
+    			if (currentGroup != prevGroup) {
+    				if (touchCount > 5) {
+        				currentSequence += prevGroup;
+        				prevGroup = currentGroup;
+        				touchCount = 0;
+    				}
+    				else {
+    					prevGroup = currentGroup;
+    					touchCount = 0;
+    				}
+    				
+    			}
+    			else if (currentGroup == prevGroup) {
+    				touchCount++;
+    			}
+	
+    		}
+    		
+    	}
+    	if (touchCount > 5) {
+    		currentSequence += prevGroup;
+    	}
+    	Log.v("AJ", "end of assessFlow " + currentSequence);
+    	getSuggestions();
+    }
         
     private boolean changeCompassView() {
     	int currSeqLen = currentGlidingSequence.length();
@@ -639,12 +681,12 @@ public class SoftKeyboard extends InputMethodService
     		secondChar = currentGlidingSequence.charAt(i+1);
     		//Log.d("AJ", "first conditional is " + (!clockwise && ((firstChar > secondChar) || (firstChar == '1' && secondChar == '9'))));
     		//Log.d("AJ", "second conditional is " + (!counterclockwise && ((firstChar < secondChar) || (firstChar == '9' && secondChar == '1'))));
-    		if (!clockwise && ((firstChar > secondChar) || (firstChar == '1' && secondChar == '9'))) {
+    		if (!clockwise && ((firstChar == (secondChar + 1)) || (firstChar == '1' && secondChar == '9'))) {
     			groupProgressionCount++;
     			counterclockwise = true;
     		}
     		
-    		else if (!counterclockwise && ((firstChar < secondChar) || (firstChar == '9' && secondChar == '1'))) {
+    		else if (!counterclockwise && (((firstChar + 1) == secondChar) || (firstChar == '9' && secondChar == '1'))) {
     			groupProgressionCount++;
     			clockwise = true;
     		}
@@ -702,7 +744,7 @@ public class SoftKeyboard extends InputMethodService
 
 	
 	public void addNewWord(String newWord) {
-		Log.v("AJ" ,"creating a new word " + currentSequence);
+		//Log.v("AJ" ,"creating a new word " + currentSequence);
 		Combo temp = currentCombos.get(currentSequence);
 		if (temp == null) {
 			Word newWordObj = new Word(newWord, 9001);
@@ -735,12 +777,12 @@ public class SoftKeyboard extends InputMethodService
     	
         	Combo temp = currentCombos.get(currentSequence);
         	
-            Log.d("AJ", "In getSuggestions CURRENT SEQUENCE " + currentSequence);
+           // Log.d("AJ", "In getSuggestions CURRENT SEQUENCE " + currentSequence);
             List<Word> words = new LinkedList<Word>();
             
             if (temp != null) {
             	words = temp.getWordsSorted();
-            	Log.d("AJ", "In getSuggestions getting words " + words.toString());
+            	//Log.d("AJ", "In getSuggestions getting words " + words.toString());
             	if(words.get(0).getWord() != null)
             		candidates = new ArrayList<String>();
             	for (int k = 0; k < words.size() && k < 12; k++) {
@@ -998,7 +1040,7 @@ public class SoftKeyboard extends InputMethodService
     	if(candidates != null){
             CharSequence ci = candidates.get(index);
             getCurrentInputConnection().commitText(ci, 1);
-            Log.v("AJ" ,"the ci is " + "" + ci.toString());
+            //Log.v("AJ" ,"the ci is " + "" + ci.toString());
             
           
             if(creatingNewWord == true) {

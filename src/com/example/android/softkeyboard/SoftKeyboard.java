@@ -231,6 +231,18 @@ public class SoftKeyboard extends InputMethodService
         final Bitmap wg = BitmapFactory.decodeResource(getResources(), R.drawable.wg);
         final Bitmap nwg = BitmapFactory.decodeResource(getResources(), R.drawable.nwg);
         final Bitmap center = BitmapFactory.decodeResource(getResources(), R.drawable.center);
+        
+        final Bitmap sg0 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers0);
+        final Bitmap sg1 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers1);
+        final Bitmap sg2 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers2);
+        final Bitmap sg3 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers3);
+        final Bitmap sg4 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers4);
+        final Bitmap sg5 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers5);
+        final Bitmap sg6 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers6);
+        final Bitmap sg7 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers7);
+        final Bitmap sg8 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers8);
+        final Bitmap sg9 = BitmapFactory.decodeResource(getResources(), R.drawable.compassnumbers9);
+        
     	compass = (ImageView) mInputView.findViewById(R.id.compass);
     	gestureDetector = new GestureDetector(this, new MyGestureDetector());
     	final Handler _handler = new Handler(); 
@@ -259,7 +271,7 @@ public class SoftKeyboard extends InputMethodService
 	                	
 	                    case MotionEvent.ACTION_DOWN:
 	                    	
-		                    if(!gliding) {
+		                    if(inputChars) {
 		                            if (nb.getPixel(iX,currY)!=0) {
 		                                // NORTH BUMPER
 		                            	prevButton = "northBump";
@@ -459,19 +471,83 @@ public class SoftKeyboard extends InputMethodService
 		                        }
 		                        getSuggestions();
 		                    }
-	                        return true;     
+	                
+	                        else if (inputNums) {
+	                        	if (sg0.getPixel(iX,currY)!=0) {
+	                                // number 0
+	                            	prevButton = "num0";
+	                            	Log.d("Number 0", "was picked");
+	                            }               
+	                       
+	                            if (sg1.getPixel(iX,currY)!=0) {
+	                            	// number 1
+	                            	prevButton = "num1";
+	                            	Log.d("Number 1", "was picked");
+	                            }               
+	                      
+	                            if (sg2.getPixel(iX,currY)!=0) {
+	                            	// number 2
+	                            	prevButton = "num2";
+	                            	Log.d("Number 2", "was picked");
+	                            }               
+	                       
+	                            if (sg3.getPixel(iX,currY)!=0) {
+	                            	// number 3
+	                            	prevButton = "num3";
+	                            	Log.d("Number 3", "was picked");
+	                            }      
+	                      
+	                            if (sg4.getPixel(iX,currY)!=0) {
+	                            	// number 4
+	                            	prevButton = "num4";
+	                            	Log.d("Number 4", "was picked");
+	                            }  
+	                            
+	                            if (sg5.getPixel(iX,currY)!=0) {
+	                            	// number 5
+	                            	prevButton = "num5";
+	                            	Log.d("Number 5", "was picked");
+	                            }  
+	                            
+	                            if (sg6.getPixel(iX,currY)!=0) {
+	                            	// number 6
+	                            	prevButton = "num6";
+	                            	Log.d("Number 6", "was picked");
+	                            }  
+	                            
+	                            if (sg7.getPixel(iX,currY)!=0) {
+	                            	// number 7
+	                            	prevButton = "num7";
+	                            	Log.d("Number 7", "was picked");
+	                            }  
+	                            
+	                            if (sg8.getPixel(iX,currY)!=0) {
+	                            	// number 8
+	                            	prevButton = "num8";
+	                            	Log.d("Number 8", "was picked");
+	                            }  
+	                            
+	                            if (sg9.getPixel(iX,currY)!=0) {
+	                            	// number 9
+	                            	prevButton = "num9";
+	                            	Log.d("Number 9", "was picked");
+	                            }  
+	                            commitNumberInput(prevButton);
+	                        }
+	                        return true;
+
 	                        
 	                    case MotionEvent.ACTION_UP:
 	                    	_handler.removeCallbacks(_longPressed);
-	                    	if(gliding == true) {
-	                    		//Log.d("AJ", "gliding action done handle possibilties! changeCompassView is " + changeCompassView());
+	                    	//if(gliding == true) {
+	                    		Log.d("AJ", "gliding action done handle possibilties! changeCompassView is " + changeCompassView() + " and inputChars is " + inputChars + " and inputNums is " + inputNums);
 	                    		
-	                    		if (changeCompassView() && inputChars) {
+	                    		if (changeCompassView() && inputChars == true) {
 	                    			compass.setImageResource(R.drawable.compassnumbers);
 	                    			inputNums = true;
 	                    			inputChars = false;
 	                    		}
-	                    		else if (changeCompassView() && inputNums) {
+	                    		else if (changeCompassView() && inputNums == true) {
 	                    			compass.setImageResource(R.drawable.compasslower);
 	                    			inputNums = false;
 	                    			inputChars = true;
@@ -484,10 +560,10 @@ public class SoftKeyboard extends InputMethodService
 	                    		////////////assessFlow(pointsQ);
 	                    		currentGlidingSequence = "";
 	                    		pointsQ.clear();
-	                    		gliding=false;
-	                    	}
-	                    	
-	                    	else if (isXYPositive && iX<center.getWidth() && currY<center.getHeight()) {
+	                    		//gliding=false;
+	                    	//}
+	                    	//else
+	                    	if (isXYPositive && iX<center.getWidth() && currY<center.getHeight()) {
 	                        	if(center.getPixel(iX,currY) != 0) {
 	                        		prevButton = "center";
 	                        		prevXTouch = iX;
@@ -518,16 +594,16 @@ public class SoftKeyboard extends InputMethodService
 	                    		compass.setLayoutParams(layoutCoords);
 	                    		break;
 	                    	}
-	                    	if (isXYPositive && prevButton.equals("text")){
+	                    	if (isXYPositive) { //&& prevButton.equals("text")){
 	                    		//newMyPoint = new MyPoint(iX, currY);
 	                           // pointsQ.add(newMyPoint);
 	                            //Log.d("AJ", "moving Swyping");
 	                            gliding = true;
 	                            
-	                            if(changeCompassView()) {
+	                            /*if(changeCompassView()) {
 		                            prevButton = "gliding";
 
-	                            }
+	                            }*/
 	                            
 	                            
 	                            if (ng.getPixel(iX,currY)!=0) {
@@ -634,36 +710,40 @@ public class SoftKeyboard extends InputMethodService
     }
     
     private void assessFlow() {
+    	Log.d("AJ", currentGlidingSequence);
     	int currSeqLen = currentGlidingSequence.length();
     	int touchCount = 0;
-    	char prevGroup =  currentGlidingSequence.charAt(0);
-    	char currentGroup;
-    	Log.v("AJ", currentGlidingSequence);
-    	//String analyzedSequence = "";
-    	for (int i = 0; i < currSeqLen; i++) {
-    		currentGroup = currentGlidingSequence.charAt(i);
-    		if (currentGroup >= '0' && currentGroup <= '7') {
-    			if (currentGroup != prevGroup) {
-    				if (touchCount > 5) {
-        				currentSequence += prevGroup;
-        				prevGroup = currentGroup;
-        				touchCount = 0;
-    				}
-    				else {
-    					prevGroup = currentGroup;
-    					touchCount = 0;
-    				}
-    				
-    			}
-    			else if (currentGroup == prevGroup) {
-    				touchCount++;
-    			}
-	
-    		}
-    		
-    	}
-    	if (touchCount > 5) {
-    		currentSequence += prevGroup;
+    	if (currSeqLen > 0) {
+	    	char prevGroup =  currentGlidingSequence.charAt(0);
+	    	char currentGroup;
+	    	Log.v("AJ", currentGlidingSequence);
+	    	//String analyzedSequence = "";
+	    	for (int i = 0; i < currSeqLen; i++) {
+	    		currentGroup = currentGlidingSequence.charAt(i);
+	    		if (currentGroup >= '0' && currentGroup <= '7') {
+	    			if (currentGroup != prevGroup) {
+	    				if (touchCount > 5) {
+	        				currentSequence += prevGroup;
+	        				prevGroup = currentGroup;
+	        				touchCount = 0;
+	    				}
+	    				else {
+	    					prevGroup = currentGroup;
+	    					touchCount = 0;
+	    				}
+	    				
+	    			}
+	    			else if (currentGroup == prevGroup) {
+	    				touchCount++;
+	    			}
+		
+	    		}
+	    		
+	    	}
+    	
+	    	if (touchCount > 5) {
+	    		currentSequence += prevGroup;
+	    	}
     	}
     	Log.v("AJ", "end of assessFlow " + currentSequence);
     	getSuggestions();
@@ -681,17 +761,18 @@ public class SoftKeyboard extends InputMethodService
     		secondChar = currentGlidingSequence.charAt(i+1);
     		//Log.d("AJ", "first conditional is " + (!clockwise && ((firstChar > secondChar) || (firstChar == '1' && secondChar == '9'))));
     		//Log.d("AJ", "second conditional is " + (!counterclockwise && ((firstChar < secondChar) || (firstChar == '9' && secondChar == '1'))));
-    		if (!clockwise && ((firstChar == (secondChar + 1)) || (firstChar == '1' && secondChar == '9'))) {
+    		if (!clockwise && ((firstChar == (secondChar + 1)) || (firstChar == '0' && secondChar == '7'))) {
     			groupProgressionCount++;
     			counterclockwise = true;
     		}
     		
-    		else if (!counterclockwise && (((firstChar + 1) == secondChar) || (firstChar == '9' && secondChar == '1'))) {
+    		else if (!counterclockwise && (((firstChar + 1) == secondChar) || (firstChar == '7' && secondChar == '0'))) {
     			groupProgressionCount++;
     			clockwise = true;
     		}
     	}
-    	
+    	//currentGlidingSequence = "";
+    	Log.d("AJ","the groupProgressionCount and counterclockwise/clockwise is " + groupProgressionCount + counterclockwise + clockwise);
     	return ((clockwise || counterclockwise) && groupProgressionCount > 3);
     }
     
@@ -978,7 +1059,9 @@ public class SoftKeyboard extends InputMethodService
         }
     }
     
-    
+    private void commitNumberInput (String numberButton) {
+    	getCurrentInputConnection().commitText(numberButton.substring(3), 0);
+    }
 
     private void handleBackspace() {
         final int length = mComposing.length();

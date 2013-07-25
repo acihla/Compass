@@ -124,16 +124,8 @@ public class SoftKeyboard extends InputMethodService
     View.OnTouchListener gestureListener;
     
     private HashMap<String, Combo> currentCombos;
+    private List<Word> currentWords;
     
-    
-    private HashSet<String> words = new HashSet<String>();
-	private HashMap<String, Double> distribution = new HashMap<String, Double>();
-	private HashSet<String> combos = new HashSet<String>();
-	private HashMap<String, LinkedList<String>> combosToWords = new HashMap<String, LinkedList<String>>();
-	private HashMap<String, HashMap<String, Double>> prevWordDist = new HashMap<String, HashMap<String, Double>>();
-	private final double alpha = .0001;
-	private final double beta = .01;
-	private int count = 0;
 	private ArrayList<String> candidates = new ArrayList<String>();
 	private Boolean isPotentialNewWord = false;
 	private Boolean creatingNewWord = false;
@@ -189,11 +181,12 @@ public class SoftKeyboard extends InputMethodService
     	
     	
         InputStream myInputStream = getResources().openRawResource(R.raw.keygonsequenceoutput10k1);
-        InputStream myInputStream2 = getResources().openRawResource(R.raw.book1);
+        //InputStream myInputStream2 = getResources().openRawResource(R.raw.book1);
 
         
-        dataBuilder.initializeData(myInputStream, myInputStream2);
-        currentCombos = dataBuilder.getCombos();
+        DataBuilder.initializeData(myInputStream);
+        currentCombos = DataBuilder.getCombos();
+        Log.v("DATA SIZE", String.valueOf(currentCombos.size()));
     }
     
     /**
@@ -747,24 +740,10 @@ public class SoftKeyboard extends InputMethodService
 		//Log.v("AJ" ,"creating a new word " + currentSequence);
 		Combo temp = currentCombos.get(currentSequence);
 		if (temp == null) {
-			Word newWordObj = new Word(newWord, 9001);
-			List<Word> newWords = new LinkedList<Word>();
-			newWords.add(newWordObj);
-			Combo combo = new Combo(currentSequence, newWords);
-			combo.addWordWNewCombo(combo, currentSequence, dataBuilder);
+			new Combo(currentSequence, newWord);
 		}
 		else {
-			Boolean isUnique = true;
-			List<Word> words = new LinkedList<Word>();
-			words = temp.getWordsSorted();
-        	for (int k = 0; k < words.size(); k++) {
-        		if(words.get(k).getWord().equals(newWord)) {
-        			isUnique = false;
-        		}
-        	}
-        	if (isUnique == true) {
-    			temp.addWord(newWord);
-        	}
+    		temp.addWord(newWord);
 		}
 		
 	}
@@ -778,27 +757,24 @@ public class SoftKeyboard extends InputMethodService
         	Combo temp = currentCombos.get(currentSequence);
         	
            // Log.d("AJ", "In getSuggestions CURRENT SEQUENCE " + currentSequence);
-            List<Word> words = new LinkedList<Word>();
             
             if (temp != null) {
-            	words = temp.getWordsSorted();
+            	currentWords = temp.getWordsTap();
             	//Log.d("AJ", "In getSuggestions getting words " + words.toString());
-            	if(words.get(0).getWord() != null)
+            	if(currentWords.get(0).getWord() != null)
             		candidates = new ArrayList<String>();
-            	for (int k = 0; k < words.size() && k < 12; k++) {
-            		if (words.get(k).getWord() != null) {
-            			candidates.add(words.get(k).getWord());
+            	for (int k = 0; k < currentWords.size() && k < 12; k++) {
+            		String word = currentWords.get(k).getWord();
+            		if (word != null) {
+            			candidates.add(word);
             			updateCandidates(candidates);
             			//Log.d("currentgetWord is ", words.get(k).getWord());
             		}
-            	}
-            	if(words.size() > 0) {
-            		
-                	//Log.v("babysteps", candidates.toString() + " and words is " + words.toString());
             	}	
             } 
             else {
-            	candidates = new ArrayList<String>();
+            	//candidates = new ArrayList<String>();
+            	
             }
     }
 
@@ -1042,6 +1018,14 @@ public class SoftKeyboard extends InputMethodService
             getCurrentInputConnection().commitText(ci, 1);
             //Log.v("AJ" ,"the ci is " + "" + ci.toString());
             
+            //Increment frequency
+            if (currentWords.size() > index && currentWords.get(index).getWord().equals(ci))
+            {
+            	currentWords.get(index).incrementFrequency(1000); //figure out how much to increment by
+            	Word w = currentWords.get(index);
+            	Log.v("WORD", w.getWord());
+            	Log.v("FREQ", String.valueOf(w.getFrequency()));
+            }
           
             if(creatingNewWord == true) {
             	potentialNewWord = potentialNewWord + ci.toString();
@@ -1052,14 +1036,14 @@ public class SoftKeyboard extends InputMethodService
             	//Log.v("we are in", "fourth cond");
             }
             
-    		candidates = null;
+    		candidates = new ArrayList<String>();
     		updateCandidates(candidates);
             if (mCandidateView != null) {
                 mCandidateView.clear();
             }
     	}
             /////////////////////////updateShiftKeyState(getCurrentInputEditorInfo());
-        } 
+    } 
     
 
     private void handleClose() {

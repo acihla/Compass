@@ -1,15 +1,26 @@
 package com.example.android.softkeyboard;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Combo {
+	private static final int DEFAULT_FREQUENCY = 10000;
 	private final String _hash;
 	private List<Word> _words;
 	private List<String> _neighbors;
+	private final double ALPHA = .75;
 	
 	
+	public Combo(String hash, String word)
+	{
+		this(hash, new LinkedList<Word>());
+		addWord(word);
+		
+		DataBuilder.addToCombos(hash,this);
+	}
+
 	public Combo(String hash, List<Word> words){
 		_hash = hash;
 		_words = words;
@@ -27,18 +38,48 @@ public class Combo {
 		Collections.sort(_words);
 		return _words;
 	}
+	
+	public List<Word> getWordsTap()
+	{
+		HashMap<String, Combo> combos = DataBuilder.getCombos();
+		List<Word> combinedWords = new LinkedList<Word>(_words);
+		for (String neighbor : _neighbors)
+		{
+			if (combos.containsKey(neighbor))
+			{
+				for (Word word : combos.get(neighbor).getWords())
+				{
+					combinedWords.add(new Word(word.getWord(), (int) Math.round(word.getFrequency()*ALPHA)));
+				}
+			}
+		}
+		Collections.sort(combinedWords);
+		return combinedWords;
+	}
 
 
 	public void addWord(String word)
 	{
-		int mid = (int) Math.round(3/4*_words.size());
-		Word newWord  = new Word(word, _words.get(mid).getFrequency());
-		_words.add(newWord);
+		if (_words.size() > 0)
+		{
+			Word w = findWord(word);
+			if (w == null)
+			{
+				int mid = (int) Math.floor(3/4*_words.size());
+				Word newWord  = new Word(word, _words.get(mid).getFrequency());
+				_words.add(newWord);
+			} else {
+				w.incrementFrequency();
+			}
+		} else {
+			Word newWord = new Word(word, DEFAULT_FREQUENCY);
+			_words.add(newWord);
+		}
 	}
 	
-	public void addWordWNewCombo(Combo wordCombo, String hash, DataBuilder databuilder)
+	public void addWordWNewCombo(Combo wordCombo, String hash)
 	{
-		databuilder.addToCombos(hash,wordCombo);
+		DataBuilder.addToCombos(hash,wordCombo);
 		//_words.add(newWord);
 	}
 
@@ -60,6 +101,20 @@ public class Combo {
 			_neighbors.add(before+up+after);
 			_neighbors.add(before+down+after);
 		}
+	}
+	
+	private Word findWord(String word)
+	{
+		Word target = null;
+		for (Word w : _words)
+		{
+			if (w.getWord().equals(word))
+			{
+				target = w;
+				continue;
+			}
+		}
+		return target;
 	}
 
 }

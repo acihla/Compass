@@ -132,7 +132,6 @@ public class SoftKeyboard extends InputMethodService
 	private Boolean isUpperCase = false;
 	public String potentialNewWord = ""; 
 	private ImageView compass;
-	private DataBuilder dataBuilder = new DataBuilder();
 	private int LONG_PRESS_TIME = 700;
 	private String buttonList[];
 	
@@ -840,7 +839,7 @@ public class SoftKeyboard extends InputMethodService
            // Log.d("AJ", "In getSuggestions CURRENT SEQUENCE " + currentSequence);
             
             if (temp != null) {
-            	currentWords = temp.getWordsTap();
+            	currentWords = temp.getWordsSloppy(2);
             	//Log.d("AJ", "In getSuggestions getting words " + words.toString());
             	if(currentWords.get(0).getWord() != null)
             		candidates = new ArrayList<String>();

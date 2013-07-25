@@ -2,9 +2,15 @@ package com.example.android.softkeyboard;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * This class is dedicated to Combo from Breaking Bad. RIP.
+ * @author tbrown126
+ *
+ */
 public class Combo {
 	private static final int DEFAULT_FREQUENCY = 10000;
 	private final String _hash;
@@ -25,7 +31,6 @@ public class Combo {
 		_hash = hash;
 		_words = words;
 		generateNeighbors(_hash);
-		
 	}
 	
 	public List<Word> getWords()
@@ -35,7 +40,7 @@ public class Combo {
 	
 	public List<Word> getWordsSorted()
 	{
-		Collections.sort(_words);
+		Collections.sort(_words, Collections.reverseOrder());
 		return _words;
 	}
 	
@@ -53,8 +58,41 @@ public class Combo {
 				}
 			}
 		}
-		Collections.sort(combinedWords);
+		Collections.sort(combinedWords, Collections.reverseOrder());
 		return combinedWords;
+	}
+	
+	public List<Word> getWordsSloppy(int offBy)
+	{
+		if (offBy == 0)
+		{
+			return _words;
+		} else {
+			HashMap<String, Combo> combos = DataBuilder.getCombos();
+			List<Word> combinedWords = new LinkedList<Word>(_words);
+			HashSet<String> currentWords = new HashSet<String>();
+			for (Word word : _words)
+			{
+				currentWords.add(word.getWord());
+			}
+			for (String neighbor : _neighbors)
+			{
+				if (combos.containsKey(neighbor))
+				{
+					for (Word word : combos.get(neighbor).getWordsSloppy(offBy - 1))
+					{
+						String current = word.getWord();
+						if (!currentWords.contains(current))
+						{
+							combinedWords.add(new Word(word.getWord(), (int) Math.round(word.getFrequency()*ALPHA)));
+							currentWords.add(current);
+						}
+					}
+				}
+			}
+			Collections.sort(combinedWords, Collections.reverseOrder());
+			return combinedWords;	
+		}
 	}
 
 

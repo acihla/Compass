@@ -19,6 +19,8 @@ public class DataBuilder extends Activity {
 	private static HashMap<String, Combo> _currentCombos = new HashMap<String, Combo>();
 	private static HashMap<String, List<String>> _hashesToWords = new HashMap<String, List<String>>();
 	private static HashMap<String, Integer> _frequencies = new HashMap<String, Integer>();
+	private static HashMap<String, List<Word>> _phrases = new HashMap<String, List<Word>>();
+	private static final int SEED = 100;
 	
 	public static void initializeData(InputStream inputStream1) 
 	{
@@ -42,7 +44,6 @@ public class DataBuilder extends Activity {
 	
 	private static void readData(InputStream myInputStream)
 	{
-        
         try {
 			HSSFWorkbook workbook = new HSSFWorkbook(myInputStream);
 			HSSFSheet worksheet = workbook.getSheet("10kOutput");
@@ -87,5 +88,36 @@ public class DataBuilder extends Activity {
 	{
 		return _currentCombos;
 	}
-
+	
+	public static HashMap<String, List<Word>> getPhrases()
+	{
+		return _phrases;
+	}
+	
+	public static void addOrIncrementPhrases(String prevWord, String currentWord)
+	{
+		if (_phrases.containsKey(prevWord))
+		{
+			List<Word> words = _phrases.get(prevWord);
+			boolean isNew = true;
+			for (Word word : words)
+			{
+				if (word.getWord().equals(currentWord))
+				{
+					word.incrementFrequency(SEED);
+					isNew = false;
+					continue;
+				}
+			}
+			if (isNew)
+			{
+				words.add(new Word(currentWord, SEED));
+			}
+		} else {
+			List<Word> baseList = new LinkedList<Word>();
+			Word newWord = new Word(currentWord, SEED);
+			baseList.add(newWord);
+			_phrases.put(prevWord, baseList);
+		}
+	}
 }

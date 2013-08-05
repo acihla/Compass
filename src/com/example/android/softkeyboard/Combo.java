@@ -1,10 +1,10 @@
 package com.example.android.softkeyboard;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class is dedicated to Combo from Breaking Bad. RIP.
@@ -12,12 +12,11 @@ import java.util.List;
  *
  */
 public class Combo {
-	private static final int DEFAULT_FREQUENCY = 10000;
+	private final int DEFAULT_FREQUENCY = 10000;
 	private final String _hash;
 	private List<Word> _words;
 	private List<String> _neighbors;
 	private final double ALPHA = .75;
-	
 	
 	public Combo(String hash, String word)
 	{
@@ -40,13 +39,13 @@ public class Combo {
 	
 	public List<Word> getWordsSorted()
 	{
-		Collections.sort(_words, Collections.reverseOrder());
+		sortWords(_words);
 		return _words;
 	}
 	
 	public List<Word> getWordsTap()
 	{
-		HashMap<String, Combo> combos = DataBuilder.getCombos();
+		Map<String, Combo> combos = DataBuilder.getCombos();
 		List<Word> combinedWords = new LinkedList<Word>(_words);
 		for (String neighbor : _neighbors)
 		{
@@ -58,7 +57,7 @@ public class Combo {
 				}
 			}
 		}
-		Collections.sort(combinedWords, Collections.reverseOrder());
+		sortWords(combinedWords);
 		return combinedWords;
 	}
 	
@@ -68,7 +67,7 @@ public class Combo {
 		{
 			return _words;
 		} else {
-			HashMap<String, Combo> combos = DataBuilder.getCombos();
+			Map<String, Combo> combos = DataBuilder.getCombos();
 			List<Word> combinedWords = new LinkedList<Word>(_words);
 			HashSet<String> currentWords = new HashSet<String>();
 			for (Word word : _words)
@@ -90,9 +89,26 @@ public class Combo {
 					}
 				}
 			}
-			Collections.sort(combinedWords, Collections.reverseOrder());
+			sortWords(combinedWords);
 			return combinedWords;	
 		}
+	}
+	
+	public List<Word> getWordsLookahead(int offBy, Map<String, Double> futureFrequencies)
+	{
+		List<Word> combinedWords = getWordsSloppy(offBy);
+		List<Word> words = new LinkedList<Word>();
+		for (Word word : combinedWords)
+		{
+			double bonus = 1;
+			if (futureFrequencies.containsKey(word.getWord()))
+			{
+				bonus = futureFrequencies.get(word.getWord());
+			}
+			words.add(new Word(word.getWord(), (int)Math.round(word.getFrequency()*bonus)));
+		}
+		sortWords(words);
+		return words;
 	}
 
 
@@ -153,6 +169,11 @@ public class Combo {
 			}
 		}
 		return target;
+	}
+	
+	private void sortWords(List<Word> words)
+	{
+		Collections.sort(words, Collections.reverseOrder());
 	}
 
 }

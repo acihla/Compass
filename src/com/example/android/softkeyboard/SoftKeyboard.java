@@ -16,21 +16,18 @@
 
 package com.example.android.softkeyboard;
 
-import android.content.Context;
-import android.database.Cursor;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.inputmethodservice.InputMethodService;
-import android.inputmethodservice.Keyboard;
-import android.inputmethodservice.KeyboardView;
-import android.net.Uri;
 import android.os.Handler;
-import android.text.InputType;
-import android.text.method.MetaKeyKeyListener;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
-import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,30 +36,9 @@ import android.view.inputmethod.CompletionInfo;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
-import android.view.inputmethod.InputMethodSubtype;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 
 
@@ -123,8 +99,10 @@ public class SoftKeyboard extends InputMethodService
     private GestureDetector gestureDetector;
     View.OnTouchListener gestureListener;
     
-    private HashMap<String, Combo> currentCombos;
+    private Map<String, Combo> currentCombos;
     private List<Word> currentWords;
+    private Map<String, Double> currentFutureWords;
+    private Word prevWord;
     
 	private ArrayList<String> candidates = new ArrayList<String>();
 	private Boolean isPotentialNewWord = false;
@@ -839,7 +817,12 @@ public class SoftKeyboard extends InputMethodService
            // Log.d("AJ", "In getSuggestions CURRENT SEQUENCE " + currentSequence);
             
             if (temp != null) {
-            	currentWords = temp.getWordsSloppy(2);
+            	if (currentFutureWords != null)
+            	{
+            		currentWords = temp.getWordsLookahead(2, currentFutureWords);
+            	} else {
+            		currentWords = temp.getWordsSloppy(2);
+            	}
             	//Log.d("AJ", "In getSuggestions getting words " + words.toString());
             	if(currentWords.get(0).getWord() != null)
             		candidates = new ArrayList<String>();
@@ -1103,10 +1086,15 @@ public class SoftKeyboard extends InputMethodService
             //Increment frequency
             if (currentWords.size() > index && currentWords.get(index).getWord().equals(ci))
             {
-            	currentWords.get(index).incrementFrequency(1000); //figure out how much to increment by
             	Word w = currentWords.get(index);
-            	Log.v("WORD", w.getWord());
-            	Log.v("FREQ", String.valueOf(w.getFrequency()));
+
+            	if (prevWord != null)
+            	{
+            		prevWord.updateFutureWords(w.getWord());
+            	}
+            	currentWords.get(index).incrementFrequency(1000); //figure out how much to increment by
+            	currentFutureWords = w.getFutureWords();
+            	prevWord = w;
             }
           
             if(creatingNewWord == true) {

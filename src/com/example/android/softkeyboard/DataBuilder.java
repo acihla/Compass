@@ -6,20 +6,21 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import android.app.Activity;
-import android.util.Log;
 
 
 public class DataBuilder extends Activity {
-	private static HashMap<String, Combo> _currentCombos = new HashMap<String, Combo>();
-	private static HashMap<String, List<String>> _hashesToWords = new HashMap<String, List<String>>();
-	private static HashMap<String, Integer> _frequencies = new HashMap<String, Integer>();
-	private static HashMap<String, List<Word>> _phrases = new HashMap<String, List<Word>>();
+	private static Map<String, Combo> _currentCombos = new HashMap<String, Combo>();
+	private static Map<String, List<String>> _hashesToWords = new HashMap<String, List<String>>();
+	private static Map<String, Integer> _frequencies = new HashMap<String, Integer>();
+	private static Map<String, List<Word>> _phrases = new HashMap<String, List<Word>>();
+	
 	private static final int SEED = 100;
 	
 	public static void initializeData(InputStream inputStream1) 
@@ -84,12 +85,12 @@ public class DataBuilder extends Activity {
 		_currentCombos.put(hash, newCombo);
 	}
 	
-	public static HashMap<String, Combo> getCombos()
+	public static Map<String, Combo> getCombos()
 	{
 		return _currentCombos;
 	}
 	
-	public static HashMap<String, List<Word>> getPhrases()
+	public static Map<String, List<Word>> getPhrases()
 	{
 		return _phrases;
 	}
